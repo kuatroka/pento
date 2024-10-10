@@ -40,3 +40,6 @@ npm-debug.log
 *.db-*
 .env
 
+# Elixir LS
+/.elixir_ls/
+

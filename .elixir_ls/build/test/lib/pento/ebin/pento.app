@@ -1,5 +1,5 @@
 {application,pento,
-             [{config_mtime,1728591989},
+             [{config_mtime,1728592609},
               {compile_env,[{pento,['Elixir.PentoWeb.Gettext'],error},
                             {pento,[dev_routes],error}]},
               {optional_applications,[]},
@@ -21,7 +21,8 @@
                         'Elixir.PentoWeb.Layouts',
                         'Elixir.PentoWeb.PageController',
                         'Elixir.PentoWeb.PageHTML','Elixir.PentoWeb.Router',
-                        'Elixir.PentoWeb.Telemetry']},
+                        'Elixir.PentoWeb.Telemetry',
+                        'Elixir.PentoWeb.WrongLive']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.Pento.Application',[]}}]}.
