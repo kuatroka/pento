@@ -29,7 +29,7 @@ defmodule PentoWeb.WrongLive do
     <%= if @won do %>
       <div class="text-center mt-4">
         <p class="p-4">You won! </p>
-        <.link patch={~p"/guess"} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <.link phx-click="restart" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Restart Game
         </.link>
       </div>
@@ -53,6 +53,11 @@ defmodule PentoWeb.WrongLive do
       end
     time = time()
     {:noreply, assign(socket, message: message, score: score, time: time, won: won)}
+  end
+
+  def handle_event("restart", _params, socket) do
+    secret_number = :rand.uniform(10)
+    {:noreply, assign(socket, won: false, message: "Make a guess: ", secret_number: secret_number)}
   end
   ##################################
 
