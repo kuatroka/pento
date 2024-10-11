@@ -29,7 +29,7 @@ defmodule PentoWeb.WrongLive do
     <%= if @won do %>
       <div class="text-center mt-4">
         <p class="p-4">You won! </p>
-        <.link patch={~p"/"} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <.link patch={~p"/guess"} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Restart Game
         </.link>
       </div>
