@@ -47,7 +47,7 @@ defmodule PentoWeb.WrongLive do
     {message, score, won} =
       cond do
         guess == socket.assigns.secret_number ->
-          {"You guessed it! The number was #{guess}.", socket.assigns.score + 1, true}
+          {"You guessed it! The number was #{guess}.", socket.assigns.score + 10, true}
         true ->
           {"Your guess: #{guess}. Wrong. Try again.", socket.assigns.score - 1, false}
       end
@@ -63,8 +63,8 @@ defmodule PentoWeb.WrongLive do
 
 
 
-  def handle_params(_params, _uri, socket) do
-    if _uri == "/guess" do
+  def handle_params(_params, uri, socket) do
+    if uri == "/guess" do
       secret_number = :rand.uniform(10)
       {:noreply, assign(socket, won: false, message: "Make a guess: ", secret_number: secret_number)}
     else
