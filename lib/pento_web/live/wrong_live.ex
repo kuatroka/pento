@@ -1,9 +1,19 @@
 defmodule PentoWeb.WrongLive do
   use PentoWeb, :live_view
 
-  def mount(_params, _session, socket) do
+
+  def mount(_params, session, socket) do
+
     secret_number = :rand.uniform(10)
-    {:ok, assign(socket, score: 0, message: "Make a guess: ", time: time(), secret_number: secret_number, won: false)}
+    {:ok,
+    assign(socket,
+      score: 0,
+      message: "Make a guess: ",
+      time: time(),
+      secret_number: secret_number,
+      won: false,
+      session_id: session["live_socket_id"]
+    )}
   end
 
 
@@ -34,6 +44,12 @@ defmodule PentoWeb.WrongLive do
         </.link>
       </div>
     <% end %>
+
+    <pre class="text-center mt-20">
+      <%=   @current_user.email %>
+      <%=  @session_id %>
+    </pre>
+
     """
   end
 
@@ -63,8 +79,8 @@ defmodule PentoWeb.WrongLive do
 
 
 
-  def handle_params(_params, _uri, socket) do
-    if _uri == "/guess" do
+  def handle_params(_params, uri, socket) do
+    if uri == "/guess" do
       secret_number = :rand.uniform(10)
       {:noreply, assign(socket, won: false, message: "Make a guess: ", secret_number: secret_number)}
     else
