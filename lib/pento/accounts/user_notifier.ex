@@ -31,7 +31,25 @@ defmodule Pento.Accounts.UserNotifier do
 
     #{url}
 
-    If you didn't create an account with us, please ignore this.
+    If you didn't create an account with us, just ignore this.
+
+    ==============================
+    """)
+  end
+
+  @doc """
+  Deliver welcome email after account confirmation.
+  """
+  def deliver_welcome_email(user) do
+    deliver(user.email, "Welcome to Pento!", """
+
+    ==============================
+
+    Hi #{user.email},
+
+    Welcome to Pento! Your account has been successfully confirmed.
+
+    Thank you for joining us.
 
     ==============================
     """)

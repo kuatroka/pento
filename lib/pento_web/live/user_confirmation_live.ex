@@ -2,6 +2,7 @@ defmodule PentoWeb.UserConfirmationLive do
   use PentoWeb, :live_view
 
   alias Pento.Accounts
+  alias Pento.Accounts.UserNotifier
 
   def render(%{live_action: :edit} = assigns) do
     ~H"""
@@ -32,7 +33,8 @@ defmodule PentoWeb.UserConfirmationLive do
   # leaked token giving the user access to the account.
   def handle_event("confirm_account", %{"user" => %{"token" => token}}, socket) do
     case Accounts.confirm_user(token) do
-      {:ok, _} ->
+      {:ok, user} ->
+        UserNotifier.deliver_welcome_email(user)
         {:noreply,
          socket
          |> put_flash(:info, "User confirmed successfully.")
