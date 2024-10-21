@@ -5,7 +5,7 @@ defmodule Pento.Repo.Migrations.BackfillUsernames do
   end
 
   def up do
-    execute "UPDATE users SET username = CASE WHEN email IS NULL THEN '' ELSE split_part(email, '@', 1) END;"
+    execute "UPDATE users SET username = CASE WHEN email IS NULL THEN '' ELSE substr(email, 1, instr(email, '@') - 1) END;"
   end
 
   def down do
