@@ -46,7 +46,7 @@ defmodule Pento.Accounts.User do
         username = extract_username_from_email(email)
         put_change(changeset, :username, username)
 
-      _ ->
+      changeset ->
         # Email not in changeset, don't extract username
         put_change(changeset, :username, "") # Now this will work
     end
