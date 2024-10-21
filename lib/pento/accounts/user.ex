@@ -38,7 +38,7 @@ defmodule Pento.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :username])
+    |> cast(attrs, [:email, :password, :username]) # Ensure :username is in the changeset
     |> validate_email(opts)
     |> validate_password(opts)
     |> case do
@@ -48,19 +48,13 @@ defmodule Pento.Accounts.User do
 
       _ ->
         # Email not in changeset, don't extract username
-        put_change(user, :username, "")
+        put_change(changeset, :username, "") # Now this will work
     end
-    |> validate_email(opts)
-    |> validate_password(opts)
   end
 
   defp extract_username_from_email(email) do
-    case String.split(email, "@") do
-      [username, _] -> username
-      _ -> ""
-    end
+    String.split(email, "@") |> List.first()
   end
-
 
   defp validate_email(changeset, opts) do
     changeset
