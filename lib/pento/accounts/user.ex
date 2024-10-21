@@ -38,7 +38,7 @@ defmodule Pento.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :username])
     |> validate_email(opts)
     |> validate_password(opts)
   end
@@ -49,19 +49,8 @@ defmodule Pento.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
-    |> derive_username()
   end
 
-  defp derive_username(changeset) do
-    email = get_field(changeset, :email)
-
-    if email do
-      username = String.split(email, "@") |> List.first()
-      put_change(changeset, :username, username)
-    else
-      changeset
-    end
-  end
 
   defp validate_password(changeset, opts) do
     changeset
