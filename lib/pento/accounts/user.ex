@@ -3,6 +3,7 @@ defmodule Pento.Accounts.User do
   import Ecto.Changeset
 
   schema "users" do
+    field :username, :string
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
@@ -48,6 +49,18 @@ defmodule Pento.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
+    |> derive_username()
+  end
+
+  defp derive_username(changeset) do
+    email = get_field(changeset, :email)
+
+    if email do
+      username = String.split(email, "@") |> List.first()
+      put_change(changeset, :username, username)
+    else
+      changeset
+    end
   end
 
   defp validate_password(changeset, opts) do
