@@ -46,6 +46,8 @@ defmodule Pento.Accounts.User do
     |> validate_password(opts)
   end
 
+  defp extract_username_from_email(nil), do: ""
+
   defp extract_username_from_email(email) do
     case String.split(email, "@") do
       [username, _] -> username
