@@ -37,11 +37,22 @@ defmodule Pento.Accounts.User do
       Defaults to `true`.
   """
   def registration_changeset(user, attrs, opts \\ []) do
+    username = extract_username_from_email(attrs[:email])
+
     user
     |> cast(attrs, [:email, :password, :username])
+    |> put_change(:username, username) # Add username to changeset
     |> validate_email(opts)
     |> validate_password(opts)
   end
+
+  defp extract_username_from_email(email) do
+    case String.split(email, "@") do
+      [username, _] -> username
+      _ -> ""
+    end
+  end
+
 
   defp validate_email(changeset, opts) do
     changeset
