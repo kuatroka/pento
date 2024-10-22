@@ -17,7 +17,7 @@ defmodule PentoWeb.UserRegistrationLiveTest do
         conn
         |> log_in_user(user_fixture())
         |> live(~p"/users/register")
-        |> follow_redirect(conn, "/guess")
+        |> follow_redirect(conn, ~p"/guess")
 
       assert {:ok, _conn} = result
     end
