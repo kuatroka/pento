@@ -175,10 +175,14 @@ defmodule PentoWeb.UserAuth do
   end
 
   defp mount_current_user(socket, session) do
-    Phoenix.Component.assign_new(socket, :current_user, fn ->
+    socket
+    |> Phoenix.Component.assign_new(:current_user, fn ->
       if user_token = session["user_token"] do
         Accounts.get_user_by_session_token(user_token)
       end
+    end)
+    |> Phoenix.Component.assign_new(:session_id, fn -> 
+      session["live_socket_id"]
     end)
   end
 
