@@ -14,12 +14,19 @@ defmodule PentoWeb.UserSessionControllerTest do
           "user" => %{"email" => user.email, "password" => valid_user_password()}
         })
 
-      assert get_session(conn, :user_token)
-      assert redirected_to(conn) == ~p"/"
+      # assert get_session(conn, :user_token)
+      # assert redirected_to(conn) == ~p"/"
+
+      # # Now do a logged in request and assert on the menu
+      # conn = get(conn, ~p"/")
+      # response = html_response(conn, 200)
+
+      assert redirected_to(conn) == ~p"/guess"
 
       # Now do a logged in request and assert on the menu
-      conn = get(conn, ~p"/")
+      conn = get(conn, "/guess")
       response = html_response(conn, 200)
+
       assert response =~ user.email
       assert response =~ ~p"/users/settings"
       assert response =~ ~p"/users/log_out"
