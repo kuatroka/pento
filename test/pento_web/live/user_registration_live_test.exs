@@ -53,7 +53,7 @@ defmodule PentoWeb.UserRegistrationLiveTest do
       assert redirected_to(conn) == ~p"/guess"
 
       # Now do a logged in request and assert on the menu
-      conn = get(conn, "/guess")
+      conn = get(conn, ~p"/guess")
       response = html_response(conn, 200)
 
       assert response =~ email
