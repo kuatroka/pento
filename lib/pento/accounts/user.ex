@@ -1,6 +1,8 @@
 defmodule Pento.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
+  import Pento.Repo
 
   schema "users" do
     field :username, :string
@@ -53,8 +55,25 @@ defmodule Pento.Accounts.User do
   end
 
   defp extract_username_from_email(email) do
-    String.split(email, "@") |> List.first()
+    username = String.split(email, "@") |> List.first()
+    find_unique_username(username)
   end
+
+
+
+  defp find_unique_username(username, counter \\ 0) do
+  candidate_username = if counter == 0, do: username, else: "#{username}#{counter}"
+  query = Ecto.Query.from(u in Pento.Accounts.User, where: u.username == ^candidate_username, select: count(u.id))
+  case Pento.Repo.one(query) do
+    0 ->
+      # If the query returns 0, it means the username is unique
+      candidate_username
+    _ ->
+      # If the username is not unique, recursively call the function with an incremented counter
+      find_unique_username(username, counter + 1)
+  end
+end
+
 
   defp validate_email(changeset, opts) do
     changeset
