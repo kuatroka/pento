@@ -2,7 +2,7 @@ defmodule PentoWeb.WrongLive do
   use PentoWeb, :live_view
 
 
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
 
     secret_number = :rand.uniform(10)
     {:ok,
@@ -11,8 +11,7 @@ defmodule PentoWeb.WrongLive do
       message: "Make a guess: ",
       time: time(),
       secret_number: secret_number,
-      won: false,
-      session_id: session["live_socket_id"]
+      won: false
     )}
   end
 

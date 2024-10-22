@@ -59,21 +59,18 @@ defmodule Pento.Accounts.User do
     find_unique_username(username)
   end
 
-
-
   defp find_unique_username(username, counter \\ 0) do
-  candidate_username = if counter == 0, do: username, else: "#{username}#{counter}"
-  query = Ecto.Query.from(u in Pento.Accounts.User, where: u.username == ^candidate_username, select: count(u.id))
-  case Pento.Repo.one(query) do
-    0 ->
-      # If the query returns 0, it means the username is unique
-      candidate_username
-    _ ->
-      # If the username is not unique, recursively call the function with an incremented counter
-      find_unique_username(username, counter + 1)
+    candidate_username = if counter == 0, do: username, else: "#{username}#{counter}"
+    query = from(u in Pento.Accounts.User, where: u.username == ^candidate_username, select: count(u.id))
+    case one(query) do
+      0 ->
+        # If the query returns 0, it means the username is unique
+        candidate_username
+      _ ->
+        # If the username is not unique, recursively call the function with an incremented counter
+        find_unique_username(username, counter + 1)
+    end
   end
-end
-
 
   defp validate_email(changeset, opts) do
     changeset
@@ -82,7 +79,6 @@ end
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
   end
-
 
   defp validate_password(changeset, opts) do
     changeset
