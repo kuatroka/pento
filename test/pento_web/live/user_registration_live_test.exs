@@ -45,11 +45,17 @@ defmodule PentoWeb.UserRegistrationLiveTest do
       render_submit(form)
       conn = follow_trigger_action(form, conn)
 
-      assert redirected_to(conn) == ~p"/"
+      # assert redirected_to(conn) == ~p"/"
+
+      # # Now do a logged in request and assert on the menu
+      # conn = get(conn, "/")
+      # response = html_response(conn, 200)
+      assert redirected_to(conn) == ~p"/guess"
 
       # Now do a logged in request and assert on the menu
-      conn = get(conn, "/")
+      conn = get(conn, "/guess")
       response = html_response(conn, 200)
+
       assert response =~ email
       assert response =~ "Settings"
       assert response =~ "Log out"
