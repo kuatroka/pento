@@ -17,7 +17,7 @@ defmodule PentoWeb.UserRegistrationLiveTest do
         conn
         |> log_in_user(user_fixture())
         |> live(~p"/users/register")
-        |> follow_redirect(conn, ~p"/guess")
+        |> follow_redirect(conn, ~p"/")
 
       assert {:ok, _conn} = result
     end
@@ -48,11 +48,7 @@ defmodule PentoWeb.UserRegistrationLiveTest do
       assert redirected_to(conn) == ~p"/"
 
       # Now do a logged in request and assert on the menu
-<<<<<<< HEAD
-      conn = get(conn, ~p"/guess")
-=======
       conn = get(conn, "/")
->>>>>>> 34dfcfcdb580e3be1aa4524d6cf128199962e3a7
       response = html_response(conn, 200)
 
 
