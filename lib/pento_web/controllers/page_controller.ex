@@ -6,10 +6,13 @@ defmodule PentoWeb.PageController do
   def home(conn, _params) do
     require_authenticated_user(conn, [])
 
-    if conn.assigns.current_user do
-      redirect(conn, to: "/guess")
-    else
-      render(conn, :home)
-    end
+    # if conn.assigns.current_user do
+    #   redirect(conn, to: "/guess")
+    # else
+    #   render(conn, :home)
+    # end
+
+    render(conn, :home)
+
   end
 end

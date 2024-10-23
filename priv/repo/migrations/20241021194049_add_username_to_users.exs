@@ -7,9 +7,4 @@ defmodule Pento.Repo.Migrations.AddUsernameToUsers do
     end
   end
 
-  def down do
-    alter table(:users) do
-      remove :username
-    end
-  end
 end
