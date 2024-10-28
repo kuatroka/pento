@@ -4,6 +4,7 @@ defmodule PentoWeb.ProductLive.Index do
   alias Pento.Catalog
   alias Pento.Catalog.Product
 
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, stream(socket, :products, Catalog.list_products())}

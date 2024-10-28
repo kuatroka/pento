@@ -27,17 +27,17 @@ defmodule PentoWeb.ProductLiveTest do
       {:ok, index_live, _html} = live(conn, ~p"/products")
 
       assert index_live |> element("a", "New Product") |> render_click() =~
-               "New Product"
+              "New Product"
 
-      assert_patch(index_live, ~p"/products/new")
+    assert_patch(index_live, ~p"/products/new")
 
-      assert index_live
-             |> form("#product-form", product: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+    assert index_live
+            |> form("#product-form", product: @invalid_attrs)
+            |> render_change() =~ "can&#39;t be blank"
 
-      assert index_live
-             |> form("#product-form", product: @create_attrs)
-             |> render_submit()
+    assert index_live
+            |> form("#product-form", product: @create_attrs)
+            |> render_submit()
 
       assert_patch(index_live, ~p"/products")
 
