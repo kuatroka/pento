@@ -22,7 +22,7 @@ defmodule PentoWeb.ProductLive.FormComponent do
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:unit_price]} type="number" label="Unit price" step="any" />
-        <.input field={@form[:sku]} type="number" label="Sku" />
+        <.input field={@form[:sku]} type="number" label="SKU" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Product</.button>
         </:actions>
@@ -34,11 +34,11 @@ defmodule PentoWeb.ProductLive.FormComponent do
   @impl true
   def update(%{product: product} = assigns, socket) do
     {:ok,
-     socket
-     |> assign(assigns)
-     |> assign_new(:form, fn ->
-       to_form(Catalog.change_product(product))
-     end)}
+      socket
+      |> assign(assigns)
+      |> assign_new(:form, fn ->
+        to_form(Catalog.change_product(product))
+      end)}
   end
 
   @impl true
