@@ -5,7 +5,11 @@ defmodule PentoWeb.ProductLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok,
+      socket
+      |> assign(:my_message, "I want to believe...")
+      |> assign(:my_other_message, "Up yours...")
+    }
   end
 
   @impl true
