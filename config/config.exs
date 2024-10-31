@@ -11,6 +11,8 @@ config :pento,
   ecto_repos: [Pento.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :bcrypt_elixir, :log_rounds, 12
+
 # Configures the endpoint
 config :pento, PentoWeb.Endpoint,
   url: [host: "localhost"],
