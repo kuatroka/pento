@@ -22,12 +22,15 @@
     <.link patch={~p"/faqs/#{faq}/edit"}>Edit</.link>
   </:action>
   <:action :let={{id, faq}}>
-    <.link
-      phx-click={JS.push("upvote", value: %{id: faq.id}) |> hide("##{id}")}
-      disabled={@current_user.id == faq.user_id}
-    >
-      Upvote
-    </.link>
+    <%= if @current_user.id == faq.user_id do %>
+      <span class="text-gray-400">Upvote</span>
+    <% else %>
+      <.link
+        phx-click={JS.push("upvote", value: %{id: faq.id}) |> hide("##{id}")}
+      >
+        Upvote
+      </.link>
+    <% end %>
   </:action>
   <:action :let={{id, faq}}>
     <.link
