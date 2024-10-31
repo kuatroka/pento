@@ -1,5 +1,6 @@
 <.header>
   Listing Faqs
+  <%= @current_user.username %>
   <:actions>
     <.link patch={~p"/faqs/new"}>
       <.button>New Faq</.button>

@@ -3,8 +3,8 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "name": "pento_test",
-            "database": "${workspaceFolder:pento}/pento_test.db"
+            "name": "pento_dev",
+            "database": "${workspaceFolder:pento}/pento_dev.db"
         }
     ]
 }
