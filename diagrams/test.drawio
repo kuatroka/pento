@@ -1,0 +1,31 @@
+<mxfile host="65bd71144e">
+    <diagram id="s8gUhFMJ-S_c3awG_BBY" name="Page-1">
+        <mxGraphModel dx="871" dy="530" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="16" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="2" target="5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="Backend" style="ellipse" vertex="1" parent="1">
+                    <mxGeometry x="391.6596875" y="340" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="5" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="Inside `app` create folder `functionality1`&#10;Ex lib/app/promo/" style="rounded=1;" vertex="1" parent="1">
+                    <mxGeometry x="289.57" y="400" width="284.17" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="within `functionality1` create a file with a schema &#10;or a struct (if DB is not needed)&#10;Ex lib/app/promo/recipient.ex&#10;&#10;This file contains a schema for one of the structures that&#10;'functionality1' might need. It also contains changeset&#10;validations or modifications" style="rounded=1;" vertex="1" parent="1">
+                    <mxGeometry x="110" y="500" width="310" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" source="5" target="7" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="within `app` create file global file for `functionality1`&#10;Ex. lib/app/promo.ex&#10;&#10;This is known as Context or API and&#10; it collects all the functions to interact with&#10; the `functionality1` schema and changesets" style="rounded=1;" vertex="1" parent="1">
+                    <mxGeometry x="440" y="500" width="310" height="120" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
