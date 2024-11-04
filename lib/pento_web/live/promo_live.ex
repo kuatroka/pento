@@ -5,9 +5,9 @@ defmodule PentoWeb.PromoLive do
 
   def mount(_params, _session, socket) do
     {:ok,
-    socket
-    |> assign_recipient()
-    |> assign_changeset()
+     socket
+     |> assign_recipient()
+     |> assign_changeset()
     }
   end
 
@@ -33,9 +33,17 @@ defmodule PentoWeb.PromoLive do
         |> Map.put(:action, :validate)
       form = to_form(changeset)
       {:noreply, assign(socket, changeset: changeset, form: form)}
-
   end
 
-
-
+  def handle_event("save",
+      %{"recipient" => recipient_params},
+      %{assigns: %{recipient: recipient}} = socket) do
+      case Promo.send_promo(recipient, recipient_params) do
+        {:ok, _recipient} ->
+          {:noreply, socket |> put_flash(:info, "Promo code sent successfully!") |> push_redirect(to: "/")}
+        {:error, changeset} ->
+          form = to_form(changeset)
+          {:noreply, assign(socket, changeset: changeset, form: form)}
+      end
+  end
 end

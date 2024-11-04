@@ -5,10 +5,9 @@ defmodule Pento.Promo do
     Recipient.changeset(recipient, attrs)
   end
 
-  def send_promo(_recipient, _attrs) do
+  def send_promo(%Recipient{} = recipient, attrs) do
     # sent email to promo recipient
+    # For demonstration purposes, we'll assume the email sending is successful
     {:ok, %Recipient{}}
   end
-
-
 end
