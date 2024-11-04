@@ -15,6 +15,7 @@ defmodule PentoWeb.ProductLive.FormComponent do
       <.simple_form
         for={@form}
         id="product-form"
+        multipart
         phx-target={@myself}
         phx-change="validate"
         phx-submit="save"
@@ -26,6 +27,21 @@ defmodule PentoWeb.ProductLive.FormComponent do
         <:actions>
           <.button phx-disable-with="Saving...">Save Product</.button>
         </:actions>
+        <div phx-drop-target={@uploads.image.ref} class="dropzone">
+          <.label>Upload image</.label>
+          <.live_file_input upload={@uploads.image} />
+        </div>
+
+        <%= for image <- @uploads.image.entries do %>
+        <div class="mt-5">
+          <.live_img_preview entry={image} width="60"/>
+        </div>
+        <progress value={image.progress} max="100"/>
+
+          <%= for error <- upload_errors(@uploads.image, image) do %>
+          <.error> <%= error %> </.error>
+          <% end %>
+        <% end %>
       </.simple_form>
     </div>
     """
@@ -33,12 +49,19 @@ defmodule PentoWeb.ProductLive.FormComponent do
 
   @impl true
   def update(%{product: product} = assigns, socket) do
+
     {:ok,
       socket
       |> assign(assigns)
       |> assign_new(:form, fn ->
         to_form(Catalog.change_product(product))
-      end)}
+      end)
+      |> allow_upload(:image,
+        accept: ~w(.jpg .jpeg .png),
+        max_entries: 1,
+        max_file_size: 9_000_000,
+        auto_upload: true)
+    }
   end
 
   @impl true
@@ -72,9 +95,9 @@ defmodule PentoWeb.ProductLive.FormComponent do
         notify_parent({:saved, product})
 
         {:noreply,
-         socket
-         |> put_flash(:info, "Product created successfully")
-         |> push_patch(to: socket.assigns.patch)}
+          socket
+          |> put_flash(:info, "Product created successfully")
+          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
