@@ -38,6 +38,7 @@ defmodule PentoWeb.PromoLive do
   def handle_event("save",
       %{"recipient" => recipient_params},
       %{assigns: %{recipient: recipient}} = socket) do
+        # Process.sleep(1000)
       case Promo.send_promo(recipient, recipient_params) do
         {:ok, _recipient} ->
           {:noreply, socket |> put_flash(:info, "Promo code sent successfully!") |> push_navigate(to: "/")}
