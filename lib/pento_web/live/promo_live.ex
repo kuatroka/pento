@@ -40,7 +40,7 @@ defmodule PentoWeb.PromoLive do
       %{assigns: %{recipient: recipient}} = socket) do
       case Promo.send_promo(recipient, recipient_params) do
         {:ok, _recipient} ->
-          {:noreply, socket |> put_flash(:info, "Promo code sent successfully!") |> push_redirect(to: "/")}
+          {:noreply, socket |> put_flash(:info, "Promo code sent successfully!") |> push_navigate(to: "/")}
         {:error, changeset} ->
           form = to_form(changeset)
           {:noreply, assign(socket, changeset: changeset, form: form)}
