@@ -75,29 +75,32 @@ defmodule PentoWeb.ProductLive.FormComponent do
 
   defp save_product(socket, :new, product_params) do
     product_params = params_with_image(socket, product_params)
+
     case Catalog.create_product(product_params) do
       {:ok, product} ->
         notify_parent({:saved, product})
+
         {:noreply,
           socket
           |> put_flash(:info, "Product created successfully")
-          |> push_patch(to: socket.assigns.patch)
-          |> push_event("close_modal", %{})}
+          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
 
-  defp save_product(socket, :edit, params) do
-    product_params = params_with_image(socket, params)
+  defp save_product(socket, :edit, product_params) do
+    product_params = params_with_image(socket, product_params)
+
     case Catalog.update_product(socket.assigns.product, product_params) do
-      {:ok, _product} ->
+      {:ok, product} ->
+        notify_parent({:saved, product})
+
         {:noreply,
           socket
           |> put_flash(:info, "Product updated successfully")
-          |> push_navigate(to: socket.assigns.navigate)
-          |> push_event("close_modal", %{})}
+          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
@@ -106,24 +109,26 @@ defmodule PentoWeb.ProductLive.FormComponent do
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
-  defp params_with_image(socket, params) do
-    entries = consume_uploaded_entries(socket, :image, &upload_static_file/2)
-    IO.inspect(entries, label: "Consumed entries")
-    path = case entries do
-      [] -> nil
-      [entry] -> entry
-      [entry | _] -> entry
-    end
-    IO.inspect(path, label: "Selected path")
+  def params_with_image(socket, params) do
+    path =
+      socket
+      |> consume_uploaded_entries(:image, &upload_static_file/2)
+      |> List.first
+
     Map.put(params, "image_upload", path)
   end
 
   defp upload_static_file(%{path: path}, entry) do
-    filename = Path.basename(entry.client_name)
-    ext = Path.extname(filename)
-    base_filename = Path.rootname(filename)
-    dest = Path.join([:code.priv_dir(:pento), "static", "images", "#{base_filename}_original#{ext}"])
+    # Extract the original filename with extension
+    original_filename = entry.client_name
+    extension = Path.extname(original_filename)
+
+    # Generate the destination filename with the extracted extension
+    filename = Path.basename(path, extension) <> extension
+    dest = Path.join("priv/static/images", filename)
     File.cp!(path, dest)
-    {:ok, "/images/#{base_filename}_original#{ext}"}
+
+    {:ok, ~p"/images/#{filename}"}
   end
+
 end
