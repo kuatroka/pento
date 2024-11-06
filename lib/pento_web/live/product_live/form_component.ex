@@ -74,20 +74,7 @@ defmodule PentoWeb.ProductLive.FormComponent do
     save_product(socket, socket.assigns.action, product_params)
   end
 
-  defp save_product(socket, :edit, product_params) do
-    case Catalog.update_product(socket.assigns.product, product_params) do
-      {:ok, product} ->
-        notify_parent({:saved, product})
 
-        {:noreply,
-          socket
-          |> put_flash(:info, "Product updated successfully")
-          |> push_patch(to: socket.assigns.patch)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
-    end
-  end
 
   defp save_product(socket, :new, product_params) do
     case Catalog.create_product(product_params) do
@@ -104,5 +91,38 @@ defmodule PentoWeb.ProductLive.FormComponent do
     end
   end
 
+  defp save_product(socket, :edit, params) do
+    product_params = params_with_image(socket, params)
+    case Catalog.update_product(socket.assigns.procuct, product_params) do
+      {:ok, _product} ->
+
+        {:noreply,
+          socket
+          |> put_flash(:info, "Product updated successfully")
+          |> push_navigate(to: socket.assigns.navigate)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
+  defp params_with_image(socket, params) do
+    {ok, path} = socket
+      |> consume_uploaded_entries(:image, &upload_static_file/2)
+      |> List.first()
+    Map.put(params, "image_upload", path)
+  end
+
+  defp upload_static_file(%{path: path}, _entry) do
+    filename = Path.basename(path)
+    ext = Path.extname(filename)
+    base_filename = Path.rootname(filename)
+    dest = Path.join([:code.priv_dir(:pento), "static", "images", "#{base_filename}_original#{ext}"])
+    File.cp!(path, dest)
+    {:ok, "/images/#{base_filename}_original#{ext}"}
+  end
+
+
 end
