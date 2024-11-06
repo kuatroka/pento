@@ -80,9 +80,9 @@ defmodule PentoWeb.ProductLive.FormComponent do
         notify_parent({:saved, product})
 
         {:noreply,
-         socket
-         |> put_flash(:info, "Product created successfully")
-         |> push_patch(to: socket.assigns.patch)}
+          socket
+          |> put_flash(:info, "Product created successfully")
+          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
@@ -94,9 +94,9 @@ defmodule PentoWeb.ProductLive.FormComponent do
     case Catalog.update_product(socket.assigns.product, product_params) do
       {:ok, _product} ->
         {:noreply,
-         socket
-         |> put_flash(:info, "Product updated successfully")
-         |> push_navigate(to: socket.assigns.navigate)}
+          socket
+          |> put_flash(:info, "Product updated successfully")
+          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
