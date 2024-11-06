@@ -74,6 +74,7 @@ defmodule PentoWeb.ProductLive.FormComponent do
   end
 
   defp save_product(socket, :new, product_params) do
+    product_params = params_with_image(socket, product_params)
     case Catalog.create_product(product_params) do
       {:ok, product} ->
         notify_parent({:saved, product})
@@ -90,7 +91,7 @@ defmodule PentoWeb.ProductLive.FormComponent do
 
   defp save_product(socket, :edit, params) do
     product_params = params_with_image(socket, params)
-    case Catalog.update_product(socket.assigns.procuct, product_params) do
+    case Catalog.update_product(socket.assigns.product, product_params) do
       {:ok, _product} ->
         {:noreply,
          socket
