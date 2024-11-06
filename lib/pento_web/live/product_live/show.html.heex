@@ -18,6 +18,13 @@
   <:item title="Sku"><%= @product.sku %></:item>
 </.list>
 
+<div>
+<img
+  src={@product.image_upload}
+  alt="product image" width="200"
+>
+</div>
+
 <.back navigate={~p"/products"}>Back to products</.back>
 
 <.modal :if={@live_action == :edit} id="product-modal" show on_cancel={JS.patch(~p"/products/#{@product}")}>
