@@ -107,9 +107,8 @@ defmodule PentoWeb.ProductLive.FormComponent do
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
   defp params_with_image(socket, params) do
-    {:ok, path} = socket
-    |> consume_uploaded_entries(:image, &upload_static_file/2)
-    |> List.first()
+    {:ok, entries} = consume_uploaded_entries(socket, :image, &upload_static_file/2)
+    path = if Enum.empty?(entries), do: nil, else: List.first(entries)
     Map.put(params, "image_upload", path)
   end
 
