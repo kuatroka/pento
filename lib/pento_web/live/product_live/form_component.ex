@@ -108,7 +108,13 @@ defmodule PentoWeb.ProductLive.FormComponent do
 
   defp params_with_image(socket, params) do
     entries = consume_uploaded_entries(socket, :image, &upload_static_file/2)
-    path = if Enum.empty?(entries), do: nil, else: hd(List.first(entries))[:path]
+    IO.inspect(entries, label: "Consumed entries")
+    path = case entries do
+      [] -> nil
+      [entry] -> entry
+      [entry | _] -> entry
+    end
+    IO.inspect(path, label: "Selected path")
     Map.put(params, "image_upload", path)
   end
 
