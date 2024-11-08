@@ -9,7 +9,7 @@
         phx-change="validate"
         phx-submit="search">
 
-        <.input field={@form[:search_input]} type="number" label="SKU" phx-debounce="1000"/>
+        <.input field={@form[:search_input]} type="number" label="SKU" phx-debounce="800"/>
 
         <:actions>
             <.button phx-disable-with="Sending...">Search</.button>
