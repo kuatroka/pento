@@ -3,14 +3,44 @@ defmodule PentoWeb.ProductLive.Index do
 
   alias Pento.Catalog
   alias Pento.Catalog.Product
-
+  alias Pento.Repo
+  import Ecto.Query
 
   @impl true
   def mount(_params, _session, socket) do
     socket =
       socket
       |> stream(:products, Catalog.list_products())
+      |> assign(:query, "")
+      |> assign(:suggestions, [])
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_event("suggest", %{"query" => query}, socket) when byte_size(query) >= 2 do
+    search_term = "%#{query}%"
+    
+    suggestions =
+      from(p in Product,
+        where: like(fragment("LOWER(?)", p.name), fragment("LOWER(?)", ^search_term)) or
+               like(fragment("LOWER(?)", p.description), fragment("LOWER(?)", ^search_term)),
+        select: %{id: p.id, name: p.name, description: p.description},
+        limit: 5
+      ) |> Repo.all()
+
+    {:noreply, assign(socket, suggestions: suggestions)}
+  end
+
+  def handle_event("suggest", _, socket) do
+    {:noreply, assign(socket, suggestions: [])}
+  end
+
+  def handle_event("search-select", %{"id" => id}, socket) do
+    product = Catalog.get_product!(id)
+    {:noreply, 
+      socket 
+      |> assign(:suggestions, [])
+      |> stream_insert(:products, product)}
   end
 
   @impl true

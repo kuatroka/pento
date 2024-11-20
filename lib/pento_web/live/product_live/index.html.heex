@@ -9,6 +9,31 @@ Listing Products
   </:actions>
 </.header>
 
+<div class="relative mt-4 mb-8">
+  <form phx-change="suggest" phx-submit="search">
+    <input type="text" 
+           name="query" 
+           value={@query}
+           placeholder="Search products..." 
+           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+           autocomplete="off"
+    />
+  </form>
+  
+  <%= if length(@suggestions) > 0 do %>
+    <div class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg">
+      <%= for suggestion <- @suggestions do %>
+        <div class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+             phx-click="search-select"
+             phx-value-id={suggestion.id}>
+          <div class="font-semibold"><%= suggestion.name %></div>
+          <div class="text-sm text-gray-600"><%= suggestion.description %></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
 <.table
   id="products"
   rows={@streams.products}
