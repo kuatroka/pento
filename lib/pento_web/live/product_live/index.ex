@@ -36,11 +36,10 @@ defmodule PentoWeb.ProductLive.Index do
   end
 
   def handle_event("search-select", %{"id" => id}, socket) do
-    product = Catalog.get_product!(id)
-    {:noreply, 
-      socket 
+    {:noreply,
+      socket
       |> assign(:suggestions, [])
-      |> stream_insert(:products, product)}
+      |> push_navigate(to: ~p"/products/#{id}")}
   end
 
   @impl true
