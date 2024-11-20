@@ -13,6 +13,7 @@ defmodule PentoWeb.ProductLive.Index do
       |> stream(:products, Catalog.list_products())
       |> assign(:query, "")
       |> assign(:suggestions, [])
+      |> assign(:selected_index, -1)
     {:ok, socket}
   end
 
@@ -32,8 +33,32 @@ defmodule PentoWeb.ProductLive.Index do
   end
 
   def handle_event("suggest", _, socket) do
-    {:noreply, assign(socket, suggestions: [])}
+    {:noreply, assign(socket, suggestions: [], selected_index: -1)}
   end
+
+  def handle_event("keydown", %{"key" => "ArrowDown"}, socket) do
+    new_index = min(
+      socket.assigns.selected_index + 1,
+      length(socket.assigns.suggestions) - 1
+    )
+    {:noreply, assign(socket, :selected_index, new_index)}
+  end
+
+  def handle_event("keydown", %{"key" => "ArrowUp"}, socket) do
+    new_index = max(socket.assigns.selected_index - 1, -1)
+    {:noreply, assign(socket, :selected_index, new_index)}
+  end
+
+  def handle_event("keydown", %{"key" => "Enter"}, socket) do
+    if socket.assigns.selected_index >= 0 do
+      suggestion = Enum.at(socket.assigns.suggestions, socket.assigns.selected_index)
+      handle_event("search-select", %{"id" => suggestion.id}, socket)
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("keydown", _, socket), do: {:noreply, socket}
 
   def handle_event("search-select", %{"id" => id}, socket) do
     {:noreply,
