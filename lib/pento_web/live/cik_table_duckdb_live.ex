@@ -14,6 +14,8 @@ defmodule PentoWeb.CikTableDuckDBLive do
         {:ok, result} = Duckdbex.query(conn, "SELECT cik, cik_name, cik_ticker FROM cik_md")
 
         rows = Duckdbex.fetch_all(result)
+        IO.inspect(rows, label: "Fetched Rows")
+        IO.inspect(Enum.at(rows, 0), label: "First Row")
         total_pages = ceil(length(rows) / @page_size)
 
         socket =
