@@ -38,10 +38,15 @@ defmodule PentoWeb.CikTableDuckDBLive do
     IO.inspect(query, label: "Executing Query")
     case Duckdbex.query(socket.assigns.conn, query) do
       {:ok, result} ->
-        rows = Duckdbex.fetch_all(result)
-        IO.inspect(rows, label: "Fetched Rows")
-        {:ok, count_result} = Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md")
-        [[total_count]] = Duckdbex.fetch_all(count_result)
+        {:ok, rows} =
+          Duckdbex.query(socket.assigns.conn, query)
+          |> Duckdbex.fetch_all()
+          |> List.zip_with_index()
+          |> Enum.map(fn {[cik, cik_name, cik_ticker], index} ->
+            %{id: "row-#{index}-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}
+          end)
+
+        {:ok, [[total_count]]} = Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md") |> Duckdbex.fetch_all()
         total_pages = ceil(total_count / @page_size)
 
         socket
@@ -73,10 +78,10 @@ defmodule PentoWeb.CikTableDuckDBLive do
             </tr>
           </thead>
           <tbody id="rows" phx-update="stream">
-            <tr :for={{dom_id, row} <- @streams.rows} id={dom_id}>
-              <td><%= Enum.at(row, 0) %></td>
-              <td><%= Enum.at(row, 1) %></td>
-              <td><%= Enum.at(row, 2) %></td>
+            <tr :for={{dom_id, %{cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}} <- @streams.rows} id={dom_id}>
+              <td><%= cik %></td>
+              <td><%= cik_name %></td>
+              <td><%= cik_ticker %></td>
             </tr>
           </tbody>
         </table>
