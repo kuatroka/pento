@@ -21,7 +21,7 @@ defmodule Pento.DuckdbContext do
 
   def close_connection(%{db: db, conn: conn}) do
     # First disconnect the connection, then close the database
-    Duckdbex.close(conn)
+    Duckdbex.disconnect(conn)
     Duckdbex.close(db)
   end
 
