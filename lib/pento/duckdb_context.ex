@@ -11,19 +11,24 @@ defmodule Pento.DuckdbContext do
           {:ok, conn} ->
             {:ok, %{db: db, conn: conn}}
           {:error, reason} ->
-            Duckdbex.disconnect(db)
+            db.close()
             {:error, reason}
+          other ->
+            db.close()
+            {:error, "Unexpected return value from Duckdbex.connection/1: #{inspect(other)}"}
         end
       {:error, reason} ->
         {:error, reason}
+      other ->
+        {:error, "Unexpected return value from Duckdbex.open/1: #{inspect(other)}"}
     end
   end
 
-  def close_connection(%{db: db, conn: conn}) do
-    # First disconnect the connection, then close the database
-    Duckdbex.disconnect(conn)
-    Duckdbex.close(db)
-  end
+def close_connection(%{db: db, conn: conn}) do
+  # First disconnect the connection, then close the database
+  Duckdbex.close(conn)
+  Duckdbex.close(db)
+end
 
   def fetch_cik_page(conn, page) do
     offset = (page - 1) * @page_size
