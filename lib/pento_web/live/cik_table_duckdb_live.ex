@@ -37,40 +37,30 @@ defmodule PentoWeb.CikTableDuckDBLive do
     query = "SELECT cik, cik_name, cik_ticker FROM cik_md LIMIT #{@page_size} OFFSET #{offset}"
     IO.inspect(query, label: "Executing Query")
 
-    case Duckdbex.query(socket.assigns.conn, query) do
-      {:ok, result} ->
-        rows = 
-          result
-          |> Duckdbex.fetch_all()
-          |> elem(1)
-          |> Enum.with_index()
-          |> Enum.map(fn {row, index} ->
-            [cik, cik_name, cik_ticker] = Enum.map(row, &(&1 || ""))
-            %{id: "row-#{index}-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}
-          end)
+    with {:ok, result} <- Duckdbex.query(socket.assigns.conn, query),
+         {:ok, rows} <- Duckdbex.fetch_all(result),
+         {:ok, count_result} <- Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md"),
+         {:ok, [[total_count]]} <- Duckdbex.fetch_all(count_result) do
+      
+      processed_rows = 
+        rows
+        |> Enum.with_index()
+        |> Enum.map(fn {row, index} ->
+          [cik, cik_name, cik_ticker] = Enum.map(row, &(&1 || ""))
+          %{id: "row-#{index}-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}
+        end)
 
-        case Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md") do
-          {:ok, count_result} ->
-            {:ok, [[total_count]]} = Duckdbex.fetch_all(count_result)
-            total_pages = ceil(total_count / @page_size)
-            
-            {:noreply,
-             socket
-             |> assign(page: page, total_pages: total_pages)
-             |> stream(:rows, rows, reset: true)}
-
-          {:error, reason} ->
-            {:noreply,
-             socket
-             |> put_flash(:error, "Error executing count query: #{reason}")
-             |> assign(page: page, total_pages: 0)
-             |> stream(:rows, [], reset: true)}
-        end
-
+      total_pages = ceil(total_count / @page_size)
+      
+      {:noreply,
+       socket
+       |> assign(page: page, total_pages: total_pages)
+       |> stream(:rows, processed_rows, reset: true)}
+    else
       {:error, reason} ->
         {:noreply,
          socket
-         |> put_flash(:error, "Error fetching rows: #{reason}")
+         |> put_flash(:error, "Error fetching data: #{reason}")
          |> assign(page: page, total_pages: 0)
          |> stream(:rows, [], reset: true)}
     end
