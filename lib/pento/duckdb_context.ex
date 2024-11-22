@@ -11,7 +11,7 @@ defmodule Pento.DuckdbContext do
           {:ok, conn} ->
             {:ok, %{db: db, conn: conn}}
           {:error, reason} ->
-            Duckdbex.close(db)
+            Duckdbex.disconnect(db)
             {:error, reason}
         end
       {:error, reason} ->
