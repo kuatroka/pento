@@ -5,16 +5,19 @@ defmodule Pento.DuckdbContext do
   @page_size 10
 
   def open_connection do
-    case Duckdbex.open(@db_path) do
+    IO.inspect(Duckdbex.Config)
+    config = %Duckdbex.Config{
+      access_mode: :read_only
+    }
+
+    case Duckdbex.open(@db_path, config) do
       {:ok, db} ->
         case Duckdbex.connection(db) do
           {:ok, conn} ->
             {:ok, %{db: db, conn: conn}}
           {:error, reason} ->
-            db.close()
             {:error, reason}
           other ->
-            db.close()
             {:error, "Unexpected return value from Duckdbex.connection/1: #{inspect(other)}"}
         end
       {:error, reason} ->

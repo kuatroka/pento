@@ -4,38 +4,51 @@ defmodule PentoWeb.CikTableDuckDBLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    case DuckdbContext.open_connection() do
-      {:ok, %{conn: conn} = connection} ->
-        socket = 
+    socket =
+      case DuckdbContext.open_connection() do
+        {:ok, %{conn: _conn} = connection} ->
           socket
           |> assign(connection: connection)
           |> load_page(1)
-        
-        {:ok, socket}
 
-      {:error, reason} ->
-        {:ok, 
-         socket
-         |> put_flash(:error, "Database connection failed: #{reason}")
-         |> assign(error: reason)}
-    end
+        {:error, reason} ->
+          socket
+          |> put_flash(:error, "Database connection failed: #{reason}")
+          |> assign(error: reason)
+
+        other ->
+          socket
+          |> put_flash(:error, "Unexpected error: #{inspect(other)}")
+          |> assign(error: inspect(other))
+      end
+
+    {:ok, socket}
   end
 
   @impl true
   def handle_event("next_page", _, socket) do
+    IO.inspect("Next page clicked")
     %{page: page, total_pages: total_pages} = socket.assigns
     new_page = min(page + 1, total_pages)
-    load_page(socket, new_page)
+    socket = load_page(socket, new_page)
+    IO.inspect(socket)
+    {:noreply, socket}
   end
 
-  @impl true
   def handle_event("prev_page", _, socket) do
-    %{page: page} = socket.assigns
-    new_page = max(page - 1, 1)
-    load_page(socket, new_page)
+    IO.inspect("Next page clicked")
+    %{page: page, total_pages: total_pages} = socket.assigns
+    new_page = min(page - 1, total_pages)
+    socket = load_page(socket, new_page)
+    IO.inspect(socket)
+    {:noreply, socket}
   end
+
 
   defp load_page(socket, page) do
+    IO.inspect("Loading page #{page}")
+    IO.inspect(socket.assigns)
+    socket = assign(socket, :page, page)
     case DuckdbContext.fetch_cik_page(socket.assigns.connection.conn, page) do
       {:ok, %{rows: rows, page: page, total_pages: total_pages}} ->
         socket
