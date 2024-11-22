@@ -5,13 +5,16 @@ defmodule Pento.DuckdbContext do
   @page_size 10
 
   def open_connection do
-    with {:ok, db} <- Duckdbex.open(@db_path),
-         {:ok, conn} <- Duckdbex.connection(db) do
-      {:ok, %{db: db, conn: conn}}
-    else
-      {:error, reason} ->
-        # Ensure db is closed if connection fails
-        if is_pid(db), do: Duckdbex.close(db)
+    case Duckdbex.open(@db_path) do
+      {:ok, db} ->
+        case Duckdbex.connection(db) do
+          {:ok, conn} -> 
+            {:ok, %{db: db, conn: conn}}
+          {:error, reason} -> 
+            Duckdbex.close(db)
+            {:error, reason}
+        end
+      {:error, reason} -> 
         {:error, reason}
     end
   end
