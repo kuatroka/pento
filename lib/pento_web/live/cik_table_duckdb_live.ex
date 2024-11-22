@@ -45,9 +45,9 @@ defmodule PentoWeb.CikTableDuckDBLive do
       processed_rows = 
         rows
         |> Enum.with_index()
-        |> Enum.map(fn {row, index} ->
-          [cik, cik_name, cik_ticker] = Enum.map(row, &(&1 || ""))
-          %{id: "row-#{index}-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}
+        |> Enum.map(fn row ->
+          [cik, cik_name, cik_ticker] = row
+          %{id: "row-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker || ""}
         end)
 
       total_pages = ceil(total_count / @page_size)
