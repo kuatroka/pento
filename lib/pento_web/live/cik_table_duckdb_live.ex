@@ -1,20 +1,23 @@
 defmodule PentoWeb.CikTableDuckDBLive do
   use PentoWeb, :live_view
-  alias Duckdbex
-
-  @db_path "/Users/yo_macbook/Documents/app_data/TEST_DUCKDB/TEST_DUCKDB_FILE_FULL.duckdb" # Replace with your DuckDB file path
-  @page_size 10
+  alias Pento.DuckdbContext
 
   @impl true
   def mount(_params, _session, socket) do
-    case Duckdbex.open(@db_path) do
-      {:ok, db} ->
-        {:ok, conn} = Duckdbex.connection(db)
-        socket = assign(socket, db: db, conn: conn)
-        {:ok, load_page(socket, 1)}
+    case DuckdbContext.open_connection() do
+      {:ok, %{conn: conn} = connection} ->
+        socket = 
+          socket
+          |> assign(connection: connection)
+          |> load_page(1)
+        
+        {:ok, socket}
 
       {:error, reason} ->
-        {:ok, assign(socket, error: "Failed to open DuckDB database: #{reason}")}
+        {:ok, 
+         socket
+         |> put_flash(:error, "Database connection failed: #{reason}")
+         |> assign(error: reason)}
     end
   end
 
@@ -33,36 +36,17 @@ defmodule PentoWeb.CikTableDuckDBLive do
   end
 
   defp load_page(socket, page) do
-    offset = (page - 1) * @page_size
-    query = "SELECT cik, cik_name, cik_ticker FROM cik_md LIMIT #{@page_size} OFFSET #{offset}"
-    IO.inspect(query, label: "Executing Query")
+    case DuckdbContext.fetch_cik_page(socket.assigns.connection.conn, page) do
+      {:ok, %{rows: rows, page: page, total_pages: total_pages}} ->
+        socket
+        |> assign(page: page, total_pages: total_pages)
+        |> stream(:rows, rows, reset: true)
 
-    with {:ok, result} <- Duckdbex.query(socket.assigns.conn, query),
-         {:ok, rows} <- Duckdbex.fetch_all(result),
-         {:ok, count_result} <- Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md"),
-         {:ok, [[total_count]]} <- Duckdbex.fetch_all(count_result) do
-      
-      processed_rows = 
-        rows
-        |> Enum.with_index()
-        |> Enum.map(fn row ->
-          [cik, cik_name, cik_ticker] = row
-          %{id: "row-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker || ""}
-        end)
-
-      total_pages = ceil(total_count / @page_size)
-      
-      {:noreply,
-       socket
-       |> assign(page: page, total_pages: total_pages)
-       |> stream(:rows, processed_rows, reset: true)}
-    else
       {:error, reason} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Error fetching data: #{reason}")
-         |> assign(page: page, total_pages: 0)
-         |> stream(:rows, [], reset: true)}
+        socket
+        |> put_flash(:error, "Error fetching data: #{reason}")
+        |> assign(page: page, total_pages: 0)
+        |> stream(:rows, [], reset: true)
     end
   end
 
@@ -100,9 +84,8 @@ defmodule PentoWeb.CikTableDuckDBLive do
     """
   end
   @impl true
-  def terminate(_reason, %{assigns: %{db: db, conn: conn}}) do
-    Duckdbex.close(conn)
-    Duckdbex.close(db)
+  def terminate(_reason, %{assigns: %{connection: connection}}) do
+    DuckdbContext.close_connection(connection)
   end
 
 end
