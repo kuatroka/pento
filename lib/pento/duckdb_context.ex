@@ -37,7 +37,8 @@ defmodule Pento.DuckdbContext do
       processed_rows = 
         rows
         |> Enum.with_index()
-        |> Enum.map(fn {[cik, cik_name, cik_ticker], index} ->
+        |> Enum.map(fn {row, index} ->
+          [cik, cik_name, cik_ticker] = row
           %{
             id: "row-#{cik}", 
             cik: cik, 
