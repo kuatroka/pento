@@ -38,24 +38,33 @@ defmodule PentoWeb.CikTableDuckDBLive do
     IO.inspect(query, label: "Executing Query")
     case Duckdbex.query(socket.assigns.conn, query) do
       {:ok, result} ->
-        {:ok, rows} =
-          Duckdbex.query(socket.assigns.conn, query)
-          |> Duckdbex.fetch_all()
-          |> List.zip_with_index()
-          |> Enum.map(fn {[cik, cik_name, cik_ticker], index} ->
-            %{id: "row-#{index}-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}
-          end)
+        case Duckdbex.query(socket.assigns.conn, query) do
+          {:ok, result} ->
+            {:ok, rows} =
+              Duckdbex.fetch_all(result)
+              |> List.zip_with_index()
+              |> Enum.map(fn {[cik, cik_name, cik_ticker], index} ->
+                %{id: "row-#{index}-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}
+              end)
 
-        {:ok, [[total_count]]} = Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md") |> Duckdbex.fetch_all()
-        total_pages = ceil(total_count / @page_size)
+            {:ok, result2} = Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md")
+            {:ok, [[total_count]]} = Duckdbex.fetch_all(result2)
+            total_pages = ceil(total_count / @page_size)
 
-        socket
-        |> assign(page: page, total_pages: total_pages)
-        |> stream(:rows, rows, reset: true)
+            socket
+            |> assign(page: page, total_pages: total_pages)
+            |> stream(:rows, rows, reset: true)
+
+          {:error, reason} ->
+            socket
+            |> put_flash(:error, "Error fetching total count: #{reason}")
+            |> assign(page: page, total_pages: 0)
+            |> stream(:rows, [], reset: true)
+        end
 
       {:error, reason} ->
         socket
-        |> put_flash(:error, "Error fetching  #{reason}")
+        |> put_flash(:error, "Error fetching rows: #{reason}")
         |> assign(page: page, total_pages: 0)
         |> stream(:rows, [], reset: true)
     end
