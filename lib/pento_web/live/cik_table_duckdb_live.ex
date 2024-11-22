@@ -43,7 +43,7 @@ defmodule PentoWeb.CikTableDuckDBLive do
             {:ok, rows} =
               Duckdbex.fetch_all(result)
               |> Enum.with_index()
-              |> Enum.map(fn row, index ->
+              |> Enum.map(fn {row, index} ->
                 [cik, cik_name, cik_ticker] = Enum.map(row, &(&1 || ""))
                 %{id: "row-#{index}-#{cik}", cik: cik, cik_name: cik_name, cik_ticker: cik_ticker}
               end)
