@@ -30,9 +30,9 @@ defmodule Pento.DuckdbContext do
     query = "SELECT cik, cik_name, cik_ticker FROM cik_md LIMIT #{@page_size} OFFSET #{offset}"
 
     with {:ok, result} <- Duckdbex.query(conn, query),
-         {:ok, rows} <- Duckdbex.fetch_all(result),
+         rows <- Duckdbex.fetch_all(result),
          {:ok, count_result} <- Duckdbex.query(conn, "SELECT count(*) FROM cik_md"),
-         {:ok, [[total_count]]} <- Duckdbex.fetch_all(count_result) do
+         [[total_count]] = Duckdbex.fetch_all(count_result) do
 
       processed_rows =
         rows
