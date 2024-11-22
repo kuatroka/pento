@@ -20,7 +20,7 @@ defmodule PentoWeb.CikTableDuckDBLive do
 
         socket =
           socket
-          |> assign(page: 1, total_pages: total_pages, all_rows: rows, db: db, conn: conn) #
+          |> assign(page: 1)
 
           |> stream(:rows, [], dom_id: fn row ->
             case row do
@@ -38,25 +38,40 @@ defmodule PentoWeb.CikTableDuckDBLive do
 
   @impl true
   def handle_event("next_page", _, socket) do
-    %{page: page, total_pages: total_pages, all_rows: rows} = socket.assigns
+    %{page: page, total_pages: total_pages} = socket.assigns
     new_page = min(page + 1, total_pages)
-    {:noreply, load_page(socket, rows, new_page)}
+    {:noreply, load_page(socket, new_page)}
   end
 
   @impl true
   def handle_event("prev_page", _, socket) do
-    %{page: page, all_rows: rows} = socket.assigns
+    %{page: page} = socket.assigns
     new_page = max(page - 1, 1)
-    {:noreply, load_page(socket, rows, new_page)}
+    {:noreply, load_page(socket, new_page)}
   end
 
-  defp load_page(socket, rows, page) do
-    start_index = (page - 1) * @page_size
-    page_rows = Enum.slice(rows, start_index, @page_size)
+  defp load_page(socket, page) do
+    offset = (page - 1) * @page_size
+    query = "SELECT cik, cik_name, cik_ticker FROM cik_md LIMIT #{@page_size} OFFSET #{offset}"
+    IO.inspect(query, label: "Executing Query")
+    case Duckdbex.query(socket.assigns.conn, query) do
+      {:ok, result} ->
+        rows = Duckdbex.fetch_all(result)
+        IO.inspect(rows, label: "Fetched Rows")
+        {:ok, count_result} = Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md")
+        [[total_count]] = Duckdbex.fetch_all(count_result)
+        total_pages = ceil(total_count / @page_size)
 
-    socket
-    |> assign(page: page)
-    |> stream(:rows, page_rows, reset: true)
+        socket
+        |> assign(page: page, total_pages: total_pages)
+        |> stream(:rows, rows, reset: true)
+
+      {:error, reason} ->
+        socket
+        |> put_flash(:error, "Error fetching  #{reason}")
+        |> assign(page: page, total_pages: 0)
+        |> stream(:rows, [], reset: true)
+    end
   end
 
   @impl true
@@ -77,9 +92,9 @@ defmodule PentoWeb.CikTableDuckDBLive do
           </thead>
           <tbody id="rows" phx-update="stream">
             <tr :for={{dom_id, row} <- @streams.rows} id={dom_id}>
-              <td><%= row.cik %></td>
-              <td><%= row.cik_name %></td>
-              <td><%= row.cik_ticker %></td>
+              <td><%= Enum.at(row, 0) %></td>
+              <td><%= Enum.at(row, 1) %></td>
+              <td><%= Enum.at(row, 2) %></td>
             </tr>
           </tbody>
         </table>
@@ -92,10 +107,10 @@ defmodule PentoWeb.CikTableDuckDBLive do
     </div>
     """
   end
-
-   @impl true
-  def terminate(_reason, socket) do
-    Duckdbex.close(socket.assigns.db) # Close the database connection when the LiveView
+  @impl true
+  def terminate(_reason, %{assigns: %{db: db, conn: conn}}) do
+    Duckdbex.close(conn)
+    Duckdbex.close(db)
   end
 
 end
