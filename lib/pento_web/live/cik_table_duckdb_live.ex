@@ -7,29 +7,11 @@ defmodule PentoWeb.CikTableDuckDBLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    case Duckdbex.open(@db_path) do  # Open the DuckDB database
+    case Duckdbex.open(@db_path) do
       {:ok, db} ->
-        {:ok, conn} = Duckdbex.connection(db) # Create a connection
-
-        {:ok, result} = Duckdbex.query(conn, "SELECT cik, cik_name, cik_ticker FROM cik_md")
-
-        rows = Duckdbex.fetch_all(result)
-        IO.inspect(rows, label: "Fetched Rows")
-        IO.inspect(Enum.at(rows, 0), label: "First Row")
-        total_pages = ceil(length(rows) / @page_size)
-
-        socket =
-          socket
-          |> assign(page: 1)
-
-          |> stream(:rows, [], dom_id: fn row ->
-            case row do
-              [cik, _, _] -> "cik-#{cik}"
-              _ -> "invalid-row-#{:erlang.phash2(row)}"
-            end
-          end)
-
-        {:ok, load_page(socket, rows, 1)}
+        {:ok, conn} = Duckdbex.connection(db)
+        socket = assign(socket, db: db, conn: conn)
+        {:ok, load_page(socket, 1)}
 
       {:error, reason} ->
         {:ok, assign(socket, error: "Failed to open DuckDB database: #{reason}")}
