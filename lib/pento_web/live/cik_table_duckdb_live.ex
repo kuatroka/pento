@@ -22,7 +22,12 @@ defmodule PentoWeb.CikTableDuckDBLive do
           socket
           |> assign(page: 1, total_pages: total_pages, all_rows: rows, db: db, conn: conn) #
 
-          |> stream(:rows, [], dom_id: &"cik-#{Enum.at(&1, 0)}")
+          |> stream(:rows, [], dom_id: fn row ->
+            case row do
+              [cik, _, _] -> "cik-#{cik}"
+              _ -> "invalid-row-#{:erlang.phash2(row)}"
+            end
+          end)
 
         {:ok, load_page(socket, rows, 1)}
 
