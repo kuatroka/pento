@@ -83,11 +83,5 @@ defmodule PentoWeb.CikTableDuckDBLive do
     </div>
     """
   end
-  @impl true
-  def terminate(_reason, %{assigns: %{connection: connection}}) do
-    if Map.has_key?(connection, :db) do
-      DuckdbContext.close_connection(connection)
-    end
-  end
 
 end
