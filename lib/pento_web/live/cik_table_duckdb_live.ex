@@ -39,8 +39,10 @@ defmodule PentoWeb.CikTableDuckDBLive do
 
     case Duckdbex.query(socket.assigns.conn, query) do
       {:ok, result} ->
-        {:ok, rows} =
-          Duckdbex.fetch_all(result)
+        rows = 
+          result
+          |> Duckdbex.fetch_all()
+          |> elem(1)
           |> Enum.with_index()
           |> Enum.map(fn {row, index} ->
             [cik, cik_name, cik_ticker] = Enum.map(row, &(&1 || ""))
@@ -49,21 +51,13 @@ defmodule PentoWeb.CikTableDuckDBLive do
 
         case Duckdbex.query(socket.assigns.conn, "SELECT count(*) FROM cik_md") do
           {:ok, count_result} ->
-            case Duckdbex.fetch_all(count_result) do
-              {:ok, [[total_count]]} ->
-                total_pages = ceil(total_count / @page_size)
-                {:noreply,
-                 socket
-                 |> assign(page: page, total_pages: total_pages)
-                 |> stream(:rows, rows, reset: true)}
-
-              {:error, reason} ->
-                {:noreply,
-                 socket
-                 |> put_flash(:error, "Error fetching total count: #{reason}")
-                 |> assign(page: page, total_pages: 0)
-                 |> stream(:rows, [], reset: true)}
-            end
+            {:ok, [[total_count]]} = Duckdbex.fetch_all(count_result)
+            total_pages = ceil(total_count / @page_size)
+            
+            {:noreply,
+             socket
+             |> assign(page: page, total_pages: total_pages)
+             |> stream(:rows, rows, reset: true)}
 
           {:error, reason} ->
             {:noreply,
