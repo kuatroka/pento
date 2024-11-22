@@ -20,7 +20,7 @@ defmodule PentoWeb.ProductLive.Index do
   @impl true
   def handle_event("suggest", %{"query" => query}, socket) when byte_size(query) >= 2 do
     search_term = "%#{query}%"
-    
+
     suggestions =
       from(p in Product,
         where: like(fragment("LOWER(?)", p.name), fragment("LOWER(?)", ^search_term)) or
@@ -95,11 +95,5 @@ defmodule PentoWeb.ProductLive.Index do
     {:noreply, stream_insert(socket, :products, product)}
   end
 
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    product = Catalog.get_product!(id)
-    {:ok, _} = Catalog.delete_product(product)
 
-    {:noreply, stream_delete(socket, :products, product)}
-  end
 end

@@ -87,6 +87,8 @@ defmodule PentoWeb.Router do
 
         live "/faqs/:id", FaqLive.Show, :show
         live "/faqs/:id/show/edit", FaqLive.Show, :edit
+
+        live "/cik_table", CikTableLive
     end
   end
 

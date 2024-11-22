@@ -1,4 +1,6 @@
 defmodule Pento.SurveyTest do
+alias Pento.CatalogFixtures
+alias Pento.AccountsFixtures
   use Pento.DataCase
 
   alias Pento.Survey
@@ -7,6 +9,7 @@ defmodule Pento.SurveyTest do
     alias Pento.Survey.Demographic
 
     import Pento.SurveyFixtures
+    import Pento.AccountsFixtures
 
     @invalid_attrs %{}
 
@@ -21,7 +24,7 @@ defmodule Pento.SurveyTest do
     end
 
     test "create_demographic/1 with valid data creates a demographic" do
-      valid_attrs = %{}
+      valid_attrs = %{gender: "female", year_of_birth: 2000, user_id: user_fixture().id}
 
       assert {:ok, %Demographic{} = demographic} = Survey.create_demographic(valid_attrs)
     end
@@ -32,7 +35,7 @@ defmodule Pento.SurveyTest do
 
     test "update_demographic/2 with valid data updates the demographic" do
       demographic = demographic_fixture()
-      update_attrs = %{}
+      update_attrs = %{gender: "male", year_of_birth: 2001}
 
       assert {:ok, %Demographic{} = demographic} = Survey.update_demographic(demographic, update_attrs)
     end
@@ -114,7 +117,7 @@ defmodule Pento.SurveyTest do
   describe "ratings" do
     alias Pento.Survey.Rating
 
-    import Pento.SurveyFixtures
+    import Pento.{SurveyFixtures, AccountsFixtures, CatalogFixtures}
 
     @invalid_attrs %{stars: nil}
 
@@ -129,10 +132,11 @@ defmodule Pento.SurveyTest do
     end
 
     test "create_rating/1 with valid data creates a rating" do
-      valid_attrs = %{stars: 42}
+      valid_attrs = %{stars: 4, user_id: user_fixture().id, product_id: product_fixture().id}
+
 
       assert {:ok, %Rating{} = rating} = Survey.create_rating(valid_attrs)
-      assert rating.stars == 42
+      assert rating.stars == 4
     end
 
     test "create_rating/1 with invalid data returns error changeset" do
@@ -141,10 +145,10 @@ defmodule Pento.SurveyTest do
 
     test "update_rating/2 with valid data updates the rating" do
       rating = rating_fixture()
-      update_attrs = %{stars: 43}
+      update_attrs = %{stars: 3}
 
       assert {:ok, %Rating{} = rating} = Survey.update_rating(rating, update_attrs)
-      assert rating.stars == 43
+      assert rating.stars == 3
     end
 
     test "update_rating/2 with invalid data returns error changeset" do
