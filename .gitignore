@@ -44,6 +44,9 @@ data/*
 # Ignore env file
 .env
 
+# Ignore node_modules
+node_modules/*
+
 
 # Elixir LS
 

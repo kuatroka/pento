@@ -9,7 +9,10 @@ module.exports = {
   content: [
     "./js/**/*.js",
     "../lib/pento_web.ex",
-    "../lib/pento_web/**/*.*ex"
+    "../lib/pento_web/**/*.*ex",
+    '../node_modules/flowbite/**/*.js',
+    '../node_modules/preline/dist/*.js',
+
   ],
   theme: {
     extend: {
@@ -20,6 +23,9 @@ module.exports = {
   },
   plugins: [
     require("@tailwindcss/forms"),
+    require('preline/plugin'),
+    require('flowbite/plugin'),
+
     // Allows prefixing tailwind classes with LiveView classes to add rules
     // only when LiveView classes are applied, for example:
     //

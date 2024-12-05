@@ -1,7 +1,10 @@
 defmodule Pento.DuckdbContext do
   alias Duckdbex
 
-  @db_path "/Users/yo_macbook/Documents/app_data/TEST_DUCKDB/TEST_DUCKDB_FILE_FULL.duckdb"
+  # @db_path "/Users/yo_macbook/Documents/app_data/TEST_DUCKDB/TEST_DUCKDB_FILE_FULL.duckdb"
+
+  @db_path Application.compile_env(:pento, :duckdb_path) ||
+            System.get_env("DUCKDB_PATH")
   @page_size 10
 
   def open_connection do

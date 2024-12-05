@@ -61,7 +61,7 @@ defmodule Pento.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:explorer, "~> 0.10.0"},
-      {:duckdbex, "~> 0.3.0"}
+      {:duckdbex, "~> 0.3.8"}
     ]
   end
 

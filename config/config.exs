@@ -9,7 +9,9 @@ import Config
 
 config :pento,
   ecto_repos: [Pento.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+
+  duckdb_path: System.get_env("DUCKDB_PATH") || "/Users/yo_macbook/Documents/app_data/TEST_DUCKDB/TEST_DUCKDB_FILE_FULL.duckdb"
 
 config :bcrypt_elixir, :log_rounds, 12
 
