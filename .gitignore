@@ -10,6 +10,9 @@
 # Where 3rd-party dependencies like ExDoc output generated docs.
 /doc/
 
+## node_modules
+node_modules/
+
 # Ignore .fetch files in case you like to edit your project deps locally.
 /.fetch
 
@@ -44,13 +47,12 @@ data/*
 # Ignore env file
 .env
 
-# Ignore node_modules
-node_modules/*
 
 
 # Elixir LS
 
 .elixir_ls
+.lexical
 .aider*
 
 *.DS_Store*
